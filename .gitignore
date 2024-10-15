@@ -5,3 +5,6 @@ __pycache__
 
 # Ignore the symbolic link from pip install -e .
 disclog.egg-info
+
+# Ignore poetry build
+dist
