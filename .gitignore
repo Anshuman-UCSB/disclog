@@ -8,3 +8,6 @@ disclog.egg-info
 
 # Ignore poetry build
 dist
+
+# Ignore .env
+.env
