@@ -6,6 +6,7 @@ from backend.sql import register_user, get_cid
 
 load_dotenv()
 token = os.getenv("BOT_TOKEN")
+API_PORT = os.getenv("API_PORT")
 
 
 def exception_handler(func):
@@ -26,7 +27,7 @@ class Discbot(discord.Client):
     async def setup_hook(self) -> None:
         # create the background task and run it in the background
         self.bg_task = self.loop.create_task(self.logging_handler())
-        self.webapi = self.loop.create_task(app.run_task())
+        self.webapi = self.loop.create_task(app.run_task(port=API_PORT))
 
     async def on_ready(self):
         print(f"Logged in as {self.user} (ID: {self.user.id})")
