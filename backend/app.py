@@ -14,17 +14,26 @@ def hello_world():
 async def post_message():
     data = await request.get_json()
     message = data.get("message")
+    username = data.get("username")
     token = data.get("token")
 
     if not message or not token:
         return jsonify({"error": "Message and token are required"}), 400
 
-    # await send_message(BOT_CHANNEL, "Received message: " + message)
-    message_queue.put_nowait(message)
+    message_queue.put_nowait((message, username, token))
 
     # Process the message and token here
     # For example, you can print them or perform some action
     print(f"Received message: {message}")
-    print(f"Received token: {token}")
 
-    return jsonify({"status": "success", "message": message, "token": token}), 200
+    return (
+        jsonify(
+            {
+                "status": "success",
+                "username": username,
+                "message": message,
+                "token": token,
+            }
+        ),
+        200,
+    )
