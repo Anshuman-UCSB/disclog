@@ -1,23 +1,35 @@
-import discord
-
-intents = discord.Intents.default()
-intents.message_content = True
-
-client = discord.Client(intents=intents)
+import logging
 
 
-@client.event
-async def on_ready():
-    print(f"We have logged in as {client.user}")
+class DisclogHandler(logging.Handler):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def emit(self, record):
+        # This method is called every time a log message is emitted
+        log_message = self.format(record)
+
+        # Here you can redirect the message to your custom handler
+        self.send_to_disclog(log_message)
+
+    def send_to_disclog(self, message):
+        # Your custom logic for handling the message goes here
+        # For example, store it, send it to a server, etc.
+        print(f"Disclog received message: {message}")
 
 
-@client.event
-async def on_message(message):
-    if message.author == client.user:
-        return
+def create_logger() -> logging.Logger:
+    # Create your logger
+    logger = logging.getLogger("disclog")
+    logger.setLevel(logging.INFO)
 
-    if message.content.startswith("$hello"):
-        await message.channel.send("Hello!")
+    # Add the custom handler
+    handler = DisclogHandler()
+    # formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+    # handler.setFormatter(formatter)
+    logger.addHandler(handler)
+
+    return logger
 
 
-client.run("your token here")
+logger = create_logger()
