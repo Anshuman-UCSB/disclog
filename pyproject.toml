@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "disclog"
-version = "0.1.0"
+version = "0.2.0"
 description = "A tool for adding logging through discord."
 authors = ["Anshuman Dash <ansdash2@gmail.com>"]
 license = "MIT"
@@ -8,12 +8,12 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.8"
-discord-py = "^2.4.0"
-python-dotenv = "^1.0.1"
-
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.3"
+discord-py = "^2.4.0"
+python-dotenv = "^1.0.1"
+toml = "^0.10.2"
 
 [build-system]
 requires = ["poetry-core"]
