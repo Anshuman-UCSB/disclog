@@ -1,4 +1,16 @@
 import sqlite3
+from uuid import uuid4
+
+
+def generate_token(cursor):
+    # get all tokens from the database
+    tokens = cursor.execute("SELECT token FROM tokens")
+
+    token = str(uuid4())
+    while token in tokens:
+        token = str(uuid4())
+    print("generated token", token)
+    return token
 
 
 def create_database():
@@ -30,7 +42,7 @@ def create_database():
 def register_user(uid, username, cid):
     conn = sqlite3.connect("tokens.db")
     cursor = conn.cursor()
-    token = "RANDOMTOKEN"
+    token = generate_token(cursor)
 
     cursor.execute(
         """
@@ -46,5 +58,4 @@ def register_user(uid, username, cid):
     return token
 
 
-if __name__ == "__main__":
-    create_database()
+create_database()

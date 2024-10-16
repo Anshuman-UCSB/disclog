@@ -35,7 +35,7 @@ class Discbot(discord.Client):
             print(
                 f"Message received in channel: {message.channel} (ID: {message.channel.id}) - {message.author} - {message.author.id}"
             )
-            register_user(message.author.id, message.author, message.channel.id)
+            register_user(message.author.id, str(message.author), message.channel.id)
 
 
 if __name__ == "__main__":

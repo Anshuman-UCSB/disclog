@@ -11,3 +11,6 @@ dist
 
 # Ignore .env
 .env
+
+# Ignore database file
+*.db
