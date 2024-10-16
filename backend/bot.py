@@ -1,8 +1,8 @@
 import discord
 from dotenv import load_dotenv
 import os
-import asyncio
 from backend.app import app, message_queue
+from backend.sql import register_user
 
 load_dotenv()
 
@@ -13,9 +13,6 @@ BOT_CHANNEL = 551952998956269579
 class Discbot(discord.Client):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.queue = asyncio.Queue()
-        self.queue.put_nowait("Hello, world!")
-        self.queue.put_nowait("Another message")
 
     async def setup_hook(self) -> None:
         # create the background task and run it in the background
@@ -32,6 +29,13 @@ class Discbot(discord.Client):
         while not self.is_closed():
             message = await message_queue.get()
             await channel.send(message)
+
+    async def on_message(self, message):
+        if isinstance(message.channel, discord.DMChannel):
+            print(
+                f"Message received in channel: {message.channel} (ID: {message.channel.id}) - {message.author} - {message.author.id}"
+            )
+            register_user(message.author.id, message.author, message.channel.id)
 
 
 if __name__ == "__main__":
