@@ -31,11 +31,18 @@ class Discbot(discord.Client):
             await channel.send(message)
 
     async def on_message(self, message):
-        if isinstance(message.channel, discord.DMChannel):
+        if (
+            isinstance(message.channel, discord.DMChannel)
+            and message.author != self.user
+        ):
             print(
                 f"Message received in channel: {message.channel} (ID: {message.channel.id}) - {message.author} - {message.author.id}"
             )
-            register_user(message.author.id, str(message.author), message.channel.id)
+            token = register_user(
+                message.author.id, str(message.author), message.channel.id
+            )
+            # respond with the token
+            await message.author.send(f"Your token is: ||{token}||")
 
 
 if __name__ == "__main__":

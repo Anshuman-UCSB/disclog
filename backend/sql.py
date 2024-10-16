@@ -13,6 +13,19 @@ def generate_token(cursor):
     return token
 
 
+def get_token(cursor, uid, username):
+    token = cursor.execute(
+        """
+        SELECT token
+        FROM tokens
+        WHERE uid = ? AND username = ?
+    """,
+        (uid, username),
+    ).fetchone()
+
+    return token[0] if token else None
+
+
 def create_database():
     # Connect to the SQLite database (it will be created if it doesn't exist)
     conn = sqlite3.connect("tokens.db")
@@ -42,6 +55,11 @@ def create_database():
 def register_user(uid, username, cid):
     conn = sqlite3.connect("tokens.db")
     cursor = conn.cursor()
+
+    value = get_token(cursor, uid, username)
+    if value:
+        return value
+
     token = generate_token(cursor)
 
     cursor.execute(
@@ -54,6 +72,10 @@ def register_user(uid, username, cid):
 
     conn.commit()
     conn.close()
+    print(
+        f"User registered successfully. uid: {uid}, "
+        f"username: {username}, cid: {cid}, token: {token}"
+    )
 
     return token
 
