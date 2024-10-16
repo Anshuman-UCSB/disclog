@@ -2,50 +2,41 @@ import discord
 from dotenv import load_dotenv
 import os
 import asyncio
-import threading
-import time
+from backend.app import app, message_queue
 
-# Load environment variables from .env file
 load_dotenv()
 
-# Get the token from the environment variable
 token = os.getenv("BOT_TOKEN")
 BOT_CHANNEL = 551952998956269579
 
-intents = discord.Intents.default()
-intents.message_content = True
-client = discord.Client(intents=intents)
 
-queue = asyncio.Queue()
-queue.put_nowait("Hello, world!")
-queue.put_nowait("Another message")
+class Discbot(discord.Client):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.queue = asyncio.Queue()
+        self.queue.put_nowait("Hello, world!")
+        self.queue.put_nowait("Another message")
 
+    async def setup_hook(self) -> None:
+        # create the background task and run it in the background
+        self.bg_task = self.loop.create_task(self.my_background_task())
+        self.webapi = self.loop.create_task(app.run_task())
 
-@client.event
-async def on_ready():
-    print(f"We have logged in as {client.user}")
-    # Start the task to process the queue
-    client.loop.create_task(process_queue())
+    async def on_ready(self):
+        print(f"Logged in as {self.user} (ID: {self.user.id})")
+        print("------")
 
-
-async def process_queue():
-    while True:
-        message = await queue.get()
-        channel = client.get_channel(BOT_CHANNEL)
-        await channel.send(message)
-
-
-def start_client():
-    asyncio.run(client.start(token))
+    async def my_background_task(self):
+        await self.wait_until_ready()
+        channel = self.get_channel(BOT_CHANNEL)  # channel ID goes here
+        while not self.is_closed():
+            message = await message_queue.get()
+            await channel.send(message)
 
 
-# Start the Discord client in a separate thread
-thread = threading.Thread(target=start_client)
-thread.start()
+if __name__ == "__main__":
+    intents = discord.Intents.default()
+    intents.message_content = True
 
-# Other code can run here
-print("Discord client is running in a separate thread.")
-for i in range(10):
-    time.sleep(1)
-    print("i =", i)
-    queue.put_nowait(f"Message {i}")
+    client = Discbot(intents=intents)
+    client.run(token)
